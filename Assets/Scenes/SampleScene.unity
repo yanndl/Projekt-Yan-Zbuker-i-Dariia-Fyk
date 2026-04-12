@@ -413,6 +413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TileManager
   tilePrefab: {fileID: 2980877076726096233, guid: ee4ef98394d05994b83807084415ad02, type: 3}
+  obstaclePrefab: {fileID: 1728531185822396116, guid: e995aa96d8da4cc409ace1f1dd2e68c6, type: 3}
   zSpawn: 0
   tileLength: 10
   numberOfTiles: 5
@@ -465,6 +466,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   forwardSpeed: 10
+  maxSpeed: 30
+  speedIncrease: 0.5
   laneDistance: 3
   laneChangeSpeed: 10
   jumpForce: 8
