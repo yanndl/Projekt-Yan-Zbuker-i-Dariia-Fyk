@@ -24,13 +24,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // Speed increase
         if (forwardSpeed < maxSpeed)
         {
             forwardSpeed += speedIncrease * Time.deltaTime;
         }
 
+        // Forward movement
         Vector3 moveVector = new Vector3(0, 0, forwardSpeed);
 
+        // Jump & gravity
         if (controller.isGrounded)
         {
             verticalVelocity = -0.5f;
@@ -46,6 +49,7 @@ public class PlayerController : MonoBehaviour
 
         moveVector.y = verticalVelocity;
 
+        // Lane switching
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
             if (desiredLane < 2) desiredLane++;
@@ -55,6 +59,7 @@ public class PlayerController : MonoBehaviour
             if (desiredLane > 0) desiredLane--;
         }
 
+        // Target lane position
         Vector3 targetPosition = transform.position.z * Vector3.forward + transform.position.y * Vector3.up;
         if (desiredLane == 0) targetPosition += Vector3.left * laneDistance;
         else if (desiredLane == 2) targetPosition += Vector3.right * laneDistance;
@@ -80,7 +85,11 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
+        ScoreManager.instance.CheckHighScore();
         ScoreManager.instance.ResetScore();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().name
+        );
     }
 }
