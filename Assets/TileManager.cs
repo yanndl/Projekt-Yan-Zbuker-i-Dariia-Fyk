@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TileManager : MonoBehaviour {
     public GameObject tilePrefab;
-    public GameObject obstaclePrefab; // Field for your red cube prefab
+    public GameObject obstaclePrefab;
 
     public float zSpawn = 0;
     public float tileLength = 10;
@@ -14,7 +14,6 @@ public class TileManager : MonoBehaviour {
 
     void Start() {
         for (int i = 0; i < numberOfTiles; i++) {
-            // First 2 tiles stay empty so the player has time to start
             if (i < 2) SpawnTile(false);
             else SpawnTile(true);
         }
@@ -38,18 +37,29 @@ public class TileManager : MonoBehaviour {
         zSpawn += tileLength;
     }
 
+    // UPDATED LOGIC: Spawning 1 or 2 obstacles to increase difficulty
     void SpawnObstacle(Transform parentTile) {
-        // Choose a random lane: 0, 1, or 2
-        int lane = Random.Range(0, 3);
-        // Calculate X position (-3, 0, 3) to match player lanes
-        float xPos = (lane - 1) * 3;
+        // Randomly choose to spawn 1 or 2 blocks
+        int obstacleCount = Random.Range(1, 3);
 
-        // Spawn obstacle slightly above the floor
-        Vector3 spawnPos = new Vector3(xPos, 1, zSpawn);
-        GameObject obstacle = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+        // List of available lanes: 0 (Left), 1 (Middle), 2 (Right)
+        List<int> availableLanes = new List<int> { 0, 1, 2 };
 
-        // Parent obstacle to the tile so they get deleted together
-        obstacle.transform.parent = parentTile;
+        for (int i = 0; i < obstacleCount; i++) {
+            // Pick a random lane from what's left
+            int randomIndex = Random.Range(0, availableLanes.Count);
+            int lane = availableLanes[randomIndex];
+
+            // Remove it so we don't spawn two blocks in the same spot
+            availableLanes.RemoveAt(randomIndex);
+
+            float xPos = (lane - 1) * 3;
+            Vector3 spawnPos = new Vector3(xPos, 1, zSpawn);
+            GameObject obstacle = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+
+            // Link to the floor tile for clean deletion
+            obstacle.transform.parent = parentTile;
+        }
     }
 
     private void DeleteTile() {
