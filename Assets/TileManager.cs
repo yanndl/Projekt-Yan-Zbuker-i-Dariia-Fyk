@@ -62,6 +62,7 @@ public class TileManager : MonoBehaviour {
 
             // IMPORTANT: We create the coin WITHOUT making it a child of parentTile
             // This prevents stretching from the floor's scale
+            // Final fix for scale and coins
             Instantiate(coinPrefab, coinPos, Quaternion.identity);
         }
     }
