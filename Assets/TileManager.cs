@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class TileManager : MonoBehaviour {
+public class TileManager : MonoBehaviour
+{
     public GameObject tilePrefab;
-    public GameObject obstaclePrefab;
-    public GameObject coinPrefab;
+    public GameObject obstaclePrefab;      // обычное препятствие
+    public GameObject lowObstaclePrefab;   // низкое препятствие
 
     public float zSpawn = 0;
     public float tileLength = 10;
@@ -13,60 +14,66 @@ public class TileManager : MonoBehaviour {
     private List<GameObject> activeTiles = new List<GameObject>();
     public Transform playerTransform;
 
-    void Start() {
-        for (int i = 0; i < numberOfTiles; i++) {
+    void Start()
+    {
+        for (int i = 0; i < numberOfTiles; i++)
+        {
             if (i < 2) SpawnTile(false);
             else SpawnTile(true);
         }
     }
 
-    void Update() {
-        if (playerTransform.position.z - 15 > zSpawn - (numberOfTiles * tileLength)) {
+    void Update()
+    {
+        if (playerTransform.position.z - 15 > zSpawn - (numberOfTiles * tileLength))
+        {
             SpawnTile(true);
             DeleteTile();
         }
     }
 
-    public void SpawnTile(bool spawnItems) {
+    public void SpawnTile(bool spawnObstacles)
+    {
         GameObject go = Instantiate(tilePrefab, transform.forward * zSpawn, transform.rotation);
         activeTiles.Add(go);
 
-        if (spawnItems) {
-            SpawnObstaclesAndCoins(go.transform);
+        if (spawnObstacles)
+        {
+            SpawnObstacle(go.transform);
         }
 
         zSpawn += tileLength;
     }
 
-    void SpawnObstaclesAndCoins(Transform parentTile) {
-        int obstacleCount = Random.Range(1, 3);
-        List<int> availableLanes = new List<int> { 0, 1, 2 };
+    void SpawnObstacle(Transform parentTile)
+    {
+        int lane = Random.Range(0, 3);
+        float xPos = (lane - 1) * 3;
 
-        for (int i = 0; i < obstacleCount; i++) {
-            int randomIndex = Random.Range(0, availableLanes.Count);
-            int lane = availableLanes[randomIndex];
-            availableLanes.RemoveAt(randomIndex);
+        // ВАЖНО: как в твоём первом рабочем варианте — препятствие ставится по zSpawn
+        Vector3 spawnPos;
 
-            float xPos = (lane - 1) * 3;
-            Vector3 spawnPos = new Vector3(xPos, 1, zSpawn);
-            GameObject obstacle = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+        // выбираем тип препятствия
+        int type = Random.Range(0, 2); // 0 = обычное, 1 = низкое
 
-            // Obstacles can stay as children because they are cubes
-            obstacle.transform.parent = parentTile;
+        if (type == 0)
+        {
+            // обычное препятствие
+            spawnPos = new Vector3(xPos, 1f, zSpawn);
+            GameObject obj = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
+            obj.transform.parent = parentTile;
         }
-
-        if (availableLanes.Count > 0) {
-            int coinLane = availableLanes[Random.Range(0, availableLanes.Count)];
-            float xPosCoin = (coinLane - 1) * 3;
-            Vector3 coinPos = new Vector3(xPosCoin, 1, zSpawn);
-
-            // IMPORTANT: We create the coin WITHOUT making it a child of parentTile
-            // This prevents stretching from the floor's scale
-            Instantiate(coinPrefab, coinPos, Quaternion.identity);
+        else
+        {
+            // низкое препятствие
+            spawnPos = new Vector3(xPos, 0.5f, zSpawn);
+            GameObject obj = Instantiate(lowObstaclePrefab, spawnPos, Quaternion.identity);
+            obj.transform.parent = parentTile;
         }
     }
 
-    private void DeleteTile() {
+    private void DeleteTile()
+    {
         Destroy(activeTiles[0]);
         activeTiles.RemoveAt(0);
     }
