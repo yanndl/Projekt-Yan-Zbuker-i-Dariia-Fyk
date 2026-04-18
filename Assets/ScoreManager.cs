@@ -1,26 +1,37 @@
 using UnityEngine;
 using TMPro;
 
-public class ScoreManager : MonoBehaviour
-{
+public class ScoreManager : MonoBehaviour {
     public static ScoreManager instance;
 
-    public TextMeshProUGUI scoreText;
-    public float score;
+    public TextMeshProUGUI scoreText; // Distance UI
+    public TextMeshProUGUI coinText;  // Coins UI
 
-    void Awake()
-    {
+    public float score; // Distance value
+    private int coins;  // Coins value
+
+    void Awake() {
         instance = this;
     }
 
-    void Update()
-    {
-        score += Time.deltaTime * 10f; // скорость роста счёта
-        scoreText.text = ((int)score).ToString();
+    void Update() {
+        // Distance logic
+        score += Time.deltaTime * 10f;
+        if (scoreText != null) {
+            scoreText.text = "Distance: " + ((int)score).ToString();
+        }
     }
 
-    public void ResetScore()
-    {
+    // Method to add coins
+    public void AddCoin() {
+        coins++;
+        if (coinText != null) {
+            coinText.text = "Coins: " + coins.ToString();
+        }
+    }
+
+    public void ResetScore() {
         score = 0;
+        coins = 0;
     }
 }
