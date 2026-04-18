@@ -4,6 +4,7 @@ using UnityEngine;
 public class TileManager : MonoBehaviour {
     public GameObject tilePrefab;
     public GameObject obstaclePrefab;
+    public GameObject coinPrefab;
 
     public float zSpawn = 0;
     public float tileLength = 10;
@@ -26,39 +27,42 @@ public class TileManager : MonoBehaviour {
         }
     }
 
-    public void SpawnTile(bool spawnObstacles) {
+    public void SpawnTile(bool spawnItems) {
         GameObject go = Instantiate(tilePrefab, transform.forward * zSpawn, transform.rotation);
         activeTiles.Add(go);
 
-        if (spawnObstacles) {
-            SpawnObstacle(go.transform);
+        if (spawnItems) {
+            SpawnObstaclesAndCoins(go.transform);
         }
 
         zSpawn += tileLength;
     }
 
-    // UPDATED LOGIC: Spawning 1 or 2 obstacles to increase difficulty
-    void SpawnObstacle(Transform parentTile) {
-        // Randomly choose to spawn 1 or 2 blocks
+    void SpawnObstaclesAndCoins(Transform parentTile) {
         int obstacleCount = Random.Range(1, 3);
-
-        // List of available lanes: 0 (Left), 1 (Middle), 2 (Right)
         List<int> availableLanes = new List<int> { 0, 1, 2 };
 
         for (int i = 0; i < obstacleCount; i++) {
-            // Pick a random lane from what's left
             int randomIndex = Random.Range(0, availableLanes.Count);
             int lane = availableLanes[randomIndex];
-
-            // Remove it so we don't spawn two blocks in the same spot
             availableLanes.RemoveAt(randomIndex);
 
             float xPos = (lane - 1) * 3;
             Vector3 spawnPos = new Vector3(xPos, 1, zSpawn);
             GameObject obstacle = Instantiate(obstaclePrefab, spawnPos, Quaternion.identity);
 
-            // Link to the floor tile for clean deletion
+            // Obstacles can stay as children because they are cubes
             obstacle.transform.parent = parentTile;
+        }
+
+        if (availableLanes.Count > 0) {
+            int coinLane = availableLanes[Random.Range(0, availableLanes.Count)];
+            float xPosCoin = (coinLane - 1) * 3;
+            Vector3 coinPos = new Vector3(xPosCoin, 1, zSpawn);
+
+            // IMPORTANT: We create the coin WITHOUT making it a child of parentTile
+            // This prevents stretching from the floor's scale
+            Instantiate(coinPrefab, coinPos, Quaternion.identity);
         }
     }
 
