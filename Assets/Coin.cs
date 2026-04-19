@@ -5,7 +5,6 @@ public class Coin : MonoBehaviour {
 
     void Start() {
         // Auto-destroy after 15 seconds to keep the hierarchy clean
-        // since coins are no longer children of the tiles
         Destroy(gameObject, 15f);
     }
 
@@ -17,7 +16,11 @@ public class Coin : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         // Checking if the player touched the coin
         if (other.CompareTag("Player")) {
-            // We will add score logic here later
+            // Adding coin to the score manager
+            if (ScoreManager.instance != null) {
+                ScoreManager.instance.AddCoin();
+            }
+
             Destroy(gameObject);
         }
     }

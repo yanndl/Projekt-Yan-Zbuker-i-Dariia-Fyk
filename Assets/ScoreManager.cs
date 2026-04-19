@@ -1,47 +1,61 @@
 using UnityEngine;
 using TMPro;
 
-public class ScoreManager : MonoBehaviour
-{
+public class ScoreManager : MonoBehaviour {
     public static ScoreManager instance;
 
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI highScoreText;
+    [Header("UI References")]
+    public TextMeshProUGUI scoreText;     // Distance
+    public TextMeshProUGUI coinText;      // Coins
+    public TextMeshProUGUI highscoreText; // Best score
 
+    [Header("Current Stats")]
     public float score;
-    private int highScore;
+    private int coins;
+    private float highscore;
 
-    void Awake()
-    {
+    void Awake() {
         instance = this;
 
-        // Загружаем рекорд из памяти
-        highScore = PlayerPrefs.GetInt("HighScore", 0);
+        // Load highscore from memory
+        highscore = PlayerPrefs.GetFloat("Highscore", 0);
+        UpdateHighscoreUI();
     }
 
-    void Start()
-    {
-        // Показываем рекорд на экране
-        highScoreText.text = "BEST: " + highScore.ToString();
-    }
-
-    void Update()
-    {
+    void Update() {
+        // Distance tracking logic
         score += Time.deltaTime * 10f;
-        scoreText.text = ((int)score).ToString();
-    }
+        if (scoreText != null) {
+            scoreText.text = "Distance: " + ((int)score).ToString();
+        }
 
-    public void CheckHighScore()
-    {
-        if ((int)score > highScore)
-        {
-            highScore = (int)score;
-            PlayerPrefs.SetInt("HighScore", highScore);
+        // Check and save new highscore
+        if (score > highscore) {
+            highscore = score;
+            PlayerPrefs.SetFloat("Highscore", highscore);
+            UpdateHighscoreUI();
         }
     }
 
-    public void ResetScore()
-    {
+    private void UpdateHighscoreUI() {
+        if (highscoreText != null) {
+            highscoreText.text = "Best: " + ((int)highscore).ToString();
+        }
+    }
+
+    public void AddCoin() {
+        coins++;
+        if (coinText != null) {
+            coinText.text = "Coins: " + coins.ToString();
+        }
+    }
+
+    // This method fixes the error in PlayerController.cs
+    public void ResetScore() {
         score = 0;
+        coins = 0;
+
+        // Refresh UI after reset
+        if (coinText != null) coinText.text = "Coins: 0";
     }
 }
