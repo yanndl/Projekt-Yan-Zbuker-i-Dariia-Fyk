@@ -108,14 +108,13 @@ public class PlayerController : MonoBehaviour
     // ---- COLLISIONS ----
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-
-        // обычное препятствие
+        // РћР±С‹С‡РЅРѕРµ РїСЂРµРїСЏС‚СЃС‚РІРёРµ
         if (hit.collider.CompareTag("Obstacle"))
         {
             Die();
         }
 
-        // низкое препятствие
+        // РќРёР·РєРѕРµ РїСЂРµРїСЏС‚СЃС‚РІРёРµ (РЅСѓР¶РµРЅ РїРѕРґРєР°С‚)
         if (hit.collider.CompareTag("ObstacleLow"))
         {
             if (!isSliding)
@@ -127,9 +126,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        ScoreManager.instance.CheckHighScore();
         ScoreManager.instance.ResetScore();
-
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
