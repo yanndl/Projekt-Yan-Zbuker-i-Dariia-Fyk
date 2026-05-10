@@ -1,35 +1,39 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement; // Need this for Restart
+using UnityEngine.UI; // Need this for Button
 
 public class ScoreManager : MonoBehaviour {
     public static ScoreManager instance;
 
     [Header("UI References")]
-    public TextMeshProUGUI scoreText;     // Distance
-    public TextMeshProUGUI coinText;      // Coins
-    public TextMeshProUGUI highscoreText; // Best score
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI coinText;
+    public TextMeshProUGUI highscoreText;
+    public GameObject restartButton; // Link your button here
 
     [Header("Current Stats")]
     public float score;
     private int coins;
     private float highscore;
+    private bool isDead = false;
 
     void Awake() {
         instance = this;
-
-        // Load highscore from memory
         highscore = PlayerPrefs.GetFloat("Highscore", 0);
         UpdateHighscoreUI();
+        
+        if (restartButton != null) restartButton.SetActive(false);
     }
 
     void Update() {
-        // Distance tracking logic
+        if (isDead) return; // Stop counting distance if dead
+
         score += Time.deltaTime * 10f;
         if (scoreText != null) {
             scoreText.text = "Distance: " + ((int)score).ToString();
         }
 
-        // Check and save new highscore
         if (score > highscore) {
             highscore = score;
             PlayerPrefs.SetFloat("Highscore", highscore);
@@ -44,18 +48,29 @@ public class ScoreManager : MonoBehaviour {
     }
 
     public void AddCoin() {
+        if (isDead) return;
         coins++;
         if (coinText != null) {
             coinText.text = "Coins: " + coins.ToString();
         }
     }
 
-    // This method fixes the error in PlayerController.cs
+    // New method to show Game Over
+    public void GameOver() {
+        isDead = true;
+        Time.timeScale = 0f; // Freeze the game
+        if (restartButton != null) restartButton.SetActive(true); // Show button
+    }
+
+    // This method will be called by the Button
+    public void RestartGame() {
+        Time.timeScale = 1f; // Unfreeze time
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     public void ResetScore() {
         score = 0;
         coins = 0;
-
-        // Refresh UI after reset
         if (coinText != null) coinText.text = "Coins: 0";
     }
 }

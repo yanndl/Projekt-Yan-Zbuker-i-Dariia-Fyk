@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // Stop movement if game is paused (GameOver)
+        if (Time.timeScale == 0) return;
+
         if (forwardSpeed < maxSpeed)
         {
             forwardSpeed += speedIncrease * Time.deltaTime;
@@ -46,6 +49,7 @@ public class PlayerController : MonoBehaviour
 
         moveVector.y = verticalVelocity;
 
+        // Lane management
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
             if (desiredLane < 2) desiredLane++;
@@ -80,7 +84,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        ScoreManager.instance.ResetScore();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // Trigger Game Over in ScoreManager
+        ScoreManager.instance.GameOver();
     }
 }
